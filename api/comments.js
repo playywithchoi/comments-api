@@ -10,23 +10,13 @@ export default async function handler(req, res) {
     const { comment } = req.body;
 
     try {
+      // MongoDB 연동 코드
       await client.connect();
-      const database = client.db("comments");
-      const collection = database.collection("posts");
-
-      // 댓글을 MongoDB에 저장
-      const result = await collection.insertOne({ comment });
-      
-      res.status(200).json({ message: "Comment added successfully", result });
+      const collection = client.db("comments").collection("posts");
+      await collection.insertOne(newComment);
+      res.status(200).json({ message: '댓글이 성공적으로 저장되었습니다.' });
     } catch (error) {
-      // error가 사용되지 않으면, 그냥 로그로만 출력하거나 삭제
-      console.error("Error occurred:", error);
-      res.status(500).json({ message: "Error adding comment" });
-    } finally {
-      // MongoDB 연결 종료
-      await client.close();
+      console.error('Error occurred:', error);  // error를 사용하여 콘솔에 출력
+      res.status(500).json({ error: '댓글 저장 중 오류가 발생했습니다.' });
     }
-  } else {
-    res.status(405).json({ message: "Method not allowed" });
-  }
-}
+    
