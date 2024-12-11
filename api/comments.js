@@ -1,11 +1,11 @@
-const { MongoClient } = require("mongodb");
-const client = new MongoClient(process.env.MONGODB_URI);
+app.post("/api/comments", async (req, res) => {
+  console.log(req.body); // 요청 본문 출력
 
-async function connectToDatabase() {
+  // 나머지 처리
   try {
-    await client.connect();
-    const db = client.db(process.env.MONGODB_DB);
-    console.log("MongoDB 연결 성공:", db); // DB 연결 성공 확인
-    return db;
+    // DB에 댓글 저장
   } catch (error) {
-    console
+    console.error("에러 발생:", error);
+    res.status(500).json({ error: "서버 오류" });
+  }
+});
