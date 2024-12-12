@@ -1,25 +1,6 @@
-export default async function handler(req, res) {
-  // CORS 설정
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  res.setHeader('Access-Control-Allow-Origin', ' https://comments-api-e7k1-jaxon3i7n-yeonjus-projects-b2ee6582.vercel.app/'); // 실제 프론트엔드 URL
-
- 
-
-  // OPTIONS 요청에 대한 빠른 응답
-  if (req.method === 'OPTIONS') {
-    res.status(204).end();
-    return;
-  }
-
-  try {
-    const db = await connectToDatabase();
-    const collection = db.collection('comments');
-    // 기존 코드 유지
-
 import { MongoClient } from 'mongodb';
 
+// MongoDB 연결
 const client = new MongoClient(process.env.MONGODB_URI);
 
 async function connectToDatabase() {
@@ -35,6 +16,17 @@ async function connectToDatabase() {
 }
 
 export default async function handler(req, res) {
+  // CORS 설정
+  res.setHeader('Access-Control-Allow-Origin', '*');  // 모든 출처 허용 (배포 후 변경 필요)
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // OPTIONS 요청에 대한 빠른 응답
+  if (req.method === 'OPTIONS') {
+    res.status(204).end();
+    return;
+  }
+
   try {
     const db = await connectToDatabase();
     const collection = db.collection('comments');
