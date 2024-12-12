@@ -3,6 +3,9 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Origin', ' https://comments-api-e7k1-jaxon3i7n-yeonjus-projects-b2ee6582.vercel.app/'); // 실제 프론트엔드 URL
+
+ 
 
   // OPTIONS 요청에 대한 빠른 응답
   if (req.method === 'OPTIONS') {
