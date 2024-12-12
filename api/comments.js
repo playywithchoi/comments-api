@@ -23,7 +23,8 @@ export default async function handler(req, res) {
       const comments = await collection.find({}).toArray();
       console.log("댓글 목록:", comments);
       res.status(200).json(comments);
-    } else if (req.method === 'POST') {
+    }
+     else if (req.method === 'POST') {
       const { name, comment } = req.body;
       if (!name || !comment) {
         res.status(400).json({ error: '이름과 댓글은 필수 항목입니다.' });
