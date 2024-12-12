@@ -1,6 +1,9 @@
 export default async function handler(req, res) {
   // 요청 본문 출력
-  console.log(req.body);
+  console.log("요청 데이터:", req.body);
+  const result = await collection.insertOne({ name, comment, createdAt: new Date() });
+console.log("데이터 저장 결과: ", result);
+
 
   // DB 연결 및 처리
   try {
@@ -24,12 +27,12 @@ async function connectToDatabase() {
   try {
     await client.connect();
     const db = client.db(process.env.MONGODB_DB);
-    console.log("MongoDB 연결 성공:", db);  // DB 연결 상태 출력
+    console.log("MongoDB 연결 성공: ", db);
     return db;
   } catch (error) {
     console.error("MongoDB 연결 실패:", error);
-    throw error; // 에러가 발생하면 던짐
   }
 }
+
 console.log(req.body); // 요청 본문
 console.log("MongoDB 연결 성공");
