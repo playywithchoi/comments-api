@@ -3,16 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Comments</title>
-  <script defer src="script.js"></script>
+  <title>Comments App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      margin: 10px 0;
+    }
+  </style>
 </head>
 <body>
-  <h1>댓글</h1>
-  <ul id="comments-list"></ul>
+  <h1>댓글 앱</h1>
   <form id="comment-form">
-    <input type="text" id="name" placeholder="이름" required />
-    <input type="text" id="comment" placeholder="댓글" required />
-    <button type="submit">댓글 남기기</button>
+    <input type="text" id="name" placeholder="이름" required>
+    <textarea id="comment" placeholder="댓글" required></textarea>
+    <button type="submit">댓글 저장</button>
   </form>
+  <ul id="comments-list"></ul>
+  <script src="./script.js"></script>
 </body>
 </html>
