@@ -31,3 +31,5 @@ async function connectToDatabase() {
     throw error; // 에러가 발생하면 던짐
   }
 }
+console.log(req.body); // 요청 본문
+console.log("MongoDB 연결 성공");
