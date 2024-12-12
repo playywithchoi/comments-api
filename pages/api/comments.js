@@ -1,27 +1,44 @@
 import { MongoClient } from 'mongodb';
 
-const uri = process.env.MONGODB_URI;  // 환경 변수에서 MongoDB URI 가져오기
-const client = new MongoClient(uri);
+const client = new MongoClient(process.env.MONGODB_URI);
+
+async function connectToDatabase() {
+  try {
+    await client.connect();
+    const db = client.db(process.env.MONGODB_DB);
+    console.log("MongoDB 연결 성공");
+    return db;
+  } catch (error) {
+    console.error("MongoDB 연결 실패:", error);
+    throw new Error("DB 연결 오류");
+  }
+}
 
 export default async function handler(req, res) {
-  if (req.method === 'POST') {
-    const { username, content } = req.body;
+  try {
+    const db = await connectToDatabase();
+    const collection = db.collection('comments');
 
-    try {
-      await client.connect();  // MongoDB 연결
-      const database = client.db('comments');  // comments 데이터베이스 선택
-      const collection = database.collection('posts');  // posts 컬렉션 선택
+    if (req.method === 'GET') {
+      const comments = await collection.find({}).toArray();
+      console.log("댓글 목록:", comments);
+      res.status(200).json(comments);
+    } else if (req.method === 'POST') {
+      const { name, comment } = req.body;
+      if (!name || !comment) {
+        res.status(400).json({ error: '이름과 댓글은 필수 항목입니다.' });
+        return;
+      }
 
-      const newComment = { username, content };
-      await collection.insertOne(newComment);  // 댓글 저장
-
-      res.status(200).json({ message: '댓글이 저장되었습니다.' });
-    } catch (error) {
-      res.status(500).json({ error: '서버 오류' });
-    } finally {
-      await client.close();  // 연결 종료
+      const result = await collection.insertOne({ name, comment, createdAt: new Date() });
+      console.log("데이터 저장 성공:", result);
+      res.status(201).json({ message: '댓글 저장 성공' });
+    } else {
+      res.setHeader('Allow', ['GET', 'POST']);
+      res.status(405).end(`Method ${req.method} Not Allowed`);
     }
-  } else {
-    res.status(405).json({ error: 'Method Not Allowed' });
+  } catch (error) {
+    console.error("API 처리 중 오류:", error);
+    res.status(500).json({ error: '서버 오류' });
   }
 }
