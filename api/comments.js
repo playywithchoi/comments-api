@@ -21,6 +21,14 @@ client.connect()
   })
   .catch(err => console.error('MongoDB connection error:', err));
 
+// CORS 설정 추가
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*'); // 모든 도메인 허용
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  next();
+});
+
 // GET: 모든 댓글 가져오기
 app.get('/api/comments', async (req, res) => {
   try {
