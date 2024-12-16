@@ -1,4 +1,4 @@
-const apiURL = 'https://comments-37inefw86-yeonjus-projects-b2ee6582.vercel.app';
+const apiURL = 'https://comments-api-e7k1.vercel.app/api/comments';
 
 async function fetchComments() {
   try {
@@ -48,5 +48,7 @@ async function submitComment(event) {
   }
 }
 
+// 페이지 로드 후 댓글 목록을 자동으로 가져오기
+document.addEventListener('DOMContentLoaded', fetchComments);
+
 document.getElementById('comment-form').addEventListener('submit', submitComment);
-fetchComments();
