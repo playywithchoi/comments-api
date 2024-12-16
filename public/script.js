@@ -1,4 +1,4 @@
-const apiURL = 'https://comments-api-e7k1.vercel.app/api/comments';
+const apiURL = 'https://comments-37inefw86-yeonjus-projects-b2ee6582.vercel.app';
 
 async function fetchComments() {
   try {

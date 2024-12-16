@@ -17,7 +17,7 @@ async function connectToDatabase() {
 
 export default async function handler(req, res) {
   // CORS 설정
-  res.setHeader('Access-Control-Allow-Origin', '*'); // 허용할 도메인으로 변경
+  res.setHeader('Access-Control-Allow-Origin', 'https://comments-37inefw86-yeonjus-projects-b2ee6582.vercel.app'); // 허용할 도메인으로 변경
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   
