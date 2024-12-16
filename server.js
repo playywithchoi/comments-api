@@ -1,67 +1,52 @@
 const express = require('express');
-const fs = require('fs');
-const path = require('path');
+const mongoose = require('mongoose');
 const cors = require('cors');
-
 const app = express();
 
 // CORS 설정
-app.use(cors({
-  origin: 'https://comments-hnh34lr7k-yeonjus-projects-b2ee6582.vercel.app' // 요청을 허용할 도메인
-}));
+app.use(cors());
+app.use(express.json()); // JSON 요청 바디 파싱
 
-app.use(express.json()); // JSON 요청 처리
-app.use(express.static('public')); // 정적 파일 제공
+// MongoDB 연결
+mongoose.connect('mongodb://localhost:27017/mydb')
+  .then(() => console.log('MongoDB connected'))
+  .catch((err) => console.log('MongoDB connection error:', err));
 
-// 댓글 저장 파일 경로
-const commentFilePath = path.join(__dirname, 'comments.txt');
-
-// 1) 댓글 목록 반환
-app.get('/api/comments', (req, res) => {
-    fs.readFile(commentFilePath, 'utf8', (err, data) => {
-        if (err) {
-            if (err.code === 'ENOENT') {
-                // 파일이 없으면 빈 배열 반환
-                return res.json({ comments: [] });
-            }
-            return res.status(500).json({ error: '서버 오류' });
-        }
-
-        // 파일 내용 파싱
-        const comments = data
-            .trim()
-            .split('\n')
-            .filter(line => line.includes(':'))
-            .map(line => {
-                const [username, content] = line.split(':');
-                return { username: username.trim(), content: content.trim() };
-            });
-
-        res.json({ comments });
-    });
+// 댓글 스키마 정의
+const commentSchema = new mongoose.Schema({
+  text: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now }
 });
 
-// 2) 댓글 저장
-app.post('/api/comments', (req, res) => {
-    const { username, content } = req.body;
+// 댓글 모델 정의
+const Comment = mongoose.model('Comment', commentSchema);
 
-    // 유효성 검사
-    if (!username || !content) {
-        return res.status(400).json({ error: '유효하지 않은 데이터' });
-    }
+// GET 요청: 모든 댓글 가져오기
+app.get('/api/comments', async (req, res) => {
+  try {
+    const comments = await Comment.find();
+    res.json(comments);
+  } catch (err) {
+    res.status(500).json({ message: '댓글 목록 가져오기 실패', error: err });
+  }
+});
 
-    // 새로운 댓글 추가
-    const comment = `${username}:${content}\n`;
-    fs.appendFile(commentFilePath, comment, (err) => {
-        if (err) {
-            return res.status(500).json({ error: '서버 오류' });
-        }
-        res.status(200).json({ message: '댓글이 저장되었습니다.' });
-    });
+// POST 요청: 댓글 저장하기
+app.post('/api/comments', async (req, res) => {
+  const newComment = new Comment({
+    text: req.body.text
+  });
+
+  try {
+    const savedComment = await newComment.save();
+    res.json(savedComment);
+  } catch (err) {
+    res.status(500).json({ message: '댓글 저장 중 오류', error: err });
+  }
 });
 
 // 서버 실행
-const port = 3002;
-app.listen(port, () => {
-    console.log(`서버가 http://localhost:${port}에서 실행 중입니다.`);
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
 });
