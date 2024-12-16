@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { MongoClient } from 'mongodb';
 
 // MongoDB 연결
@@ -16,7 +15,6 @@ async function connectToDatabase() {
   }
 }
 
-<<<<<<< HEAD
 export default async function handler(req, res) {
   // CORS 설정
   res.setHeader('Access-Control-Allow-Origin', '*');  // 모든 출처 허용 (배포 후 변경 필요)
@@ -61,16 +59,3 @@ export default async function handler(req, res) {
     res.status(500).json({ error: '서버 오류' });
   }
 }
-=======
-=======
-export default function handler(req, res) {
-  if (req.method === 'GET') {
-    res.status(200).json({ comments: [] }); // 더미 데이터 반환
-  } else if (req.method === 'POST') {
-    res.status(200).json({ message: '댓글 저장 완료' });
-  } else {
-    res.status(405).end(); // Method Not Allowed
-  }
-}
->>>>>>> 3c3af15 (Fix eslint error)
->>>>>>> 800715c2280282d247ac1f88120068d5b8dda53b
