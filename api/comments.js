@@ -1,60 +1,52 @@
 import express from 'express';
+import cors from 'cors';
 import { MongoClient } from 'mongodb';
-import cors from 'cors'; // cors 미들웨어 import
 
 const app = express();
-const client = new MongoClient(process.env.MONGODB_URI);
+const port = 5000; // 원하는 포트
 
-app.use(express.json()); // JSON 파싱
-app.use(cors({
-  origin: ['http://localhost:3002', 'https://comments-api-e7k1.vercel.app'], // 허용할 도메인
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type'],
-}));
+// MongoDB 연결 설정
+const uri = 'mongodb://localhost:27017'; // MongoDB 서버 주소 (로컬 환경의 경우)
+const client = new MongoClient(uri);
+
+app.use(cors()); // CORS 설정
+app.use(express.json()); // JSON 요청 본문을 파싱
 
 // MongoDB 연결
-async function connectToDatabase() {
+let db;
+client.connect()
+  .then(() => {
+    db = client.db('commentsDB'); // 사용할 DB 이름
+    console.log('MongoDB connected');
+  })
+  .catch(err => console.error('MongoDB connection error:', err));
+
+// GET: 모든 댓글 가져오기
+app.get('/api/comments', async (req, res) => {
   try {
-    await client.connect();
-    const db = client.db(process.env.MONGODB_DB);
-    console.log("MongoDB 연결 성공");
-    return db;
-  } catch (error) {
-    console.error("MongoDB 연결 실패:", error);
-    throw new Error("DB 연결 오류");
-  }
-}
-
-// API 요청 처리
-app.post('/api/comments', async (req, res) => {
-  try {
-    const db = await connectToDatabase();
-    const collection = db.collection('comments');
-    const { name, comment } = req.body;
-
-    if (!name || !comment) {
-      return res.status(400).json({ error: '이름과 댓글은 필수 항목입니다.' });
-    }
-
-    const result = await collection.insertOne({ name, comment, createdAt: new Date() });
-    res.status(201).json({ message: '댓글 저장 성공' });
-  } catch (error) {
-    res.status(500).json({ error: '서버 오류' });
+    const comments = await db.collection('comments').find().toArray();
+    res.status(200).json(comments);
+  } catch (err) {
+    res.status(500).json({ error: '댓글을 가져오는 중 오류가 발생했습니다.' });
   }
 });
 
-app.get('/api/comments', async (req, res) => {
+// POST: 새로운 댓글 저장하기
+app.post('/api/comments', async (req, res) => {
+  const { name, comment } = req.body;
+  if (!name || !comment) {
+    return res.status(400).json({ error: '이름과 댓글은 필수 항목입니다.' });
+  }
+  
   try {
-    const db = await connectToDatabase();
-    const collection = db.collection('comments');
-    const comments = await collection.find({}).toArray();
-    res.status(200).json(comments);
-  } catch (error) {
-    res.status(500).json({ error: '서버 오류' });
+    await db.collection('comments').insertOne({ name, comment, createdAt: new Date() });
+    res.status(201).json({ message: '댓글 저장 성공' });
+  } catch (err) {
+    res.status(500).json({ error: '댓글을 저장하는 중 오류가 발생했습니다.' });
   }
 });
 
 // 서버 시작
-app.listen(3000, () => {
-  console.log('서버가 3000번 포트에서 실행 중');
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
 });

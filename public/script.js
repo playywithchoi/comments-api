@@ -5,7 +5,7 @@ async function fetchComments() {
     const response = await fetch(apiURL);
     if (!response.ok) throw new Error('댓글 가져오기 실패');
     const comments = await response.json();
-    console.log("API 응답 데이터:", comments);
+    console.log("댓글 데이터:", comments);
 
     const commentsList = document.getElementById('comments-list');
     commentsList.innerHTML = ''; // 초기화
@@ -48,7 +48,5 @@ async function submitComment(event) {
   }
 }
 
-// 페이지 로드 후 댓글 목록을 자동으로 가져오기
-document.addEventListener('DOMContentLoaded', fetchComments);
-
 document.getElementById('comment-form').addEventListener('submit', submitComment);
+fetchComments();
