@@ -1,9 +1,15 @@
-// 필요한 모듈 가져오기
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const cors = require('cors');
 
 const app = express();
+
+// CORS 설정
+app.use(cors({
+  origin: 'https://comments-hnh34lr7k-yeonjus-projects-b2ee6582.vercel.app' // 요청을 허용할 도메인
+}));
+
 app.use(express.json()); // JSON 요청 처리
 app.use(express.static('public')); // 정적 파일 제공
 
