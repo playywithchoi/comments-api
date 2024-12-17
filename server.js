@@ -1,45 +1,39 @@
-// server.js
-require('dotenv').config(); // .env 파일을 로드
+// script.js
 
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const app = express();
-const port = 5000;
+// 클라이언트에서 API URL 직접 설정
+const apiUrl = 'https://comments-b51s753wq-yeonjus-projects-b2ee6582.vercel.app/api/comments';
 
-// MongoDB 연결
-mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err));
-
-// 미들웨어 설정
-app.use(cors()); // CORS 허용
-app.use(express.json()); // JSON 파싱
-
-// 댓글 스키마 설정
-const commentSchema = new mongoose.Schema({
-  name: String,
-  comment: String,
-});
-
-const Comment = mongoose.model('Comment', commentSchema);
-
-// API 엔드포인트 (댓글 가져오기)
-app.get('/api/comments', async (req, res) => {
+const fetchComments = async () => {
   try {
-    const comments = await Comment.find();
-    res.json(comments);
-  } catch (err) {
-    res.status(500).json({ message: '댓글을 가져오는 데 실패했습니다.' });
+    const response = await fetch(apiUrl);  // 직접 설정한 API URL 사용
+    
+    if (!response.ok) {
+      throw new Error(`댓글 목록을 가져오는 데 실패했습니다. 상태: ${response.status}`);
+    }
+    
+    const comments = await response.json();
+    displayComments(comments); // 댓글 화면에 표시
+  } catch (error) {
+    console.error('댓글 목록 가져오기 실패:', error);
   }
-});
+};
 
-// API URL 엔드포인트 (클라이언트에 API URL 제공)
-app.get('/api/url', (req, res) => {
-  res.json({ apiUrl: process.env.API_URL });
-});
+// 댓글을 화면에 표시하는 함수
+const displayComments = (comments) => {
+  const commentsList = document.getElementById('commentsList');
+  commentsList.innerHTML = ''; // 기존 댓글 목록 초기화
 
-// 서버 시작
-app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
-});
+  if (comments.length === 0) {
+    commentsList.innerHTML = '댓글이 없습니다.';
+    return;
+  }
+
+  comments.forEach(comment => {
+    const listItem = document.createElement('li');
+    listItem.textContent = `${comment.name}: ${comment.comment}`;
+    commentsList.appendChild(listItem);
+  });
+};
+
+// 페이지 로드 시 댓글 목록 가져오기
+window.onload = fetchComments;
