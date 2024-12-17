@@ -1,27 +1,25 @@
-const express = require('express');
-const cors = require('cors');  // CORS 미들웨어 import
-const mongoose = require('mongoose');
-const Comment = require('./models/comment');  // 댓글 모델 경로
-
-const app = express();
-
-// CORS 설정: 모든 도메인에서 요청을 허용
-app.use(cors());
-
-app.use(express.json()); // 요청 본문을 JSON으로 파싱
-
-// 댓글 목록 가져오기 API
-app.get('/api/comments', async (req, res) => {
+// script.js
+const fetchComments = async () => {
   try {
-    const comments = await Comment.find(); // DB에서 댓글 가져오기
-    res.json(comments); // 댓글 목록 반환
+    const response = await fetch(process.env.REACT_APP_API_URL);
+    if (!response.ok) throw new Error('댓글 목록을 가져오는 데 실패했습니다.');
+    const comments = await response.json();
+    displayComments(comments);
   } catch (error) {
-    res.status(500).json({ message: '댓글을 가져오는 데 실패했습니다.' });
+    console.error('댓글 목록 가져오기 실패:', error);
   }
-});
+};
 
-// 서버 실행
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+// 댓글을 화면에 표시하는 함수
+const displayComments = (comments) => {
+  const commentsList = document.getElementById('commentsList');
+  commentsList.innerHTML = ''; // 기존 댓글 목록 초기화
+  comments.forEach(comment => {
+    const listItem = document.createElement('li');
+    listItem.textContent = `${comment.name}: ${comment.comment}`;
+    commentsList.appendChild(listItem);
+  });
+};
+
+// 페이지 로드 시 댓글 목록 가져오기
+window.onload = fetchComments;
