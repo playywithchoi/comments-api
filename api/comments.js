@@ -1,25 +1,12 @@
-// server.js (서버 코드)
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
+const mongoose = require('mongoose');
+const Comment = require('./models/comment'); // 댓글 모델 경로
+
 const app = express();
-const port = 5000;
+app.use(cors()); // 모든 도메인에서의 요청을 허용
 
-mongoose.connect('mongodb://localhost:27017/commentsDB', { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.log('MongoDB connection error:', err));
-
-// 댓글 스키마 정의
-const commentSchema = new mongoose.Schema({
-  name: String,
-  comment: String
-});
-
-// 댓글 모델
-const Comment = mongoose.model('Comment', commentSchema);
-
-app.use(cors());
-app.use(express.json());
+app.use(express.json()); // 요청 본문을 JSON으로 파싱
 
 // 댓글 목록 가져오기 API
 app.get('/api/comments', async (req, res) => {
@@ -31,7 +18,8 @@ app.get('/api/comments', async (req, res) => {
   }
 });
 
-// 서버 시작
-app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
+// 서버 실행
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
 });
