@@ -1,34 +1,25 @@
-// 댓글 입력 폼과 목록 요소 가져오기
-const commentForm = document.getElementById('comment-form');
-const commentList = document.getElementById('comment-list');
-
-// 폼 제출 이벤트 처리
-commentForm.addEventListener('submit', function (event) {
-  event.preventDefault(); // 폼 기본 제출 막기
-
-  // 입력 필드 값 가져오기
-  const username = document.getElementById('username').value.trim();
-  const comment = document.getElementById('comment').value.trim();
-
-  // 유효성 검사
-  if (!username || !comment) {
-    alert('모든 필드를 채워주세요!');
-    return;
+// script.js (클라이언트 코드)
+const fetchComments = async () => {
+  try {
+    const response = await fetch('https://comments-b51s753wq-yeonjus-projects-b2ee6582.vercel.app/api/comments');
+    if (!response.ok) throw new Error('댓글 목록을 가져오는 데 실패했습니다.');
+    const comments = await response.json();
+    displayComments(comments); // 댓글 화면에 표시
+  } catch (error) {
+    console.error('댓글 목록 가져오기 실패:', error);
   }
+};
 
-  // 댓글 목록에 추가
-  addCommentToList(username, comment);
+// 댓글을 화면에 표시하는 함수
+const displayComments = (comments) => {
+  const commentsList = document.getElementById('commentsList');
+  commentsList.innerHTML = ''; // 기존 댓글 목록 초기화
+  comments.forEach(comment => {
+    const listItem = document.createElement('li');
+    listItem.textContent = `${comment.name}: ${comment.comment}`;
+    commentsList.appendChild(listItem);
+  });
+};
 
-  // 입력 필드 초기화
-  commentForm.reset();
-});
-
-// 댓글을 목록에 추가하는 함수
-function addCommentToList(username, comment) {
-  // 새로운 리스트 아이템 생성
-  const listItem = document.createElement('li');
-  listItem.textContent = `${username}: ${comment}`;
-
-  // 목록에 아이템 추가
-  commentList.appendChild(listItem);
-}
+// 페이지 로드 시 댓글 목록 가져오기
+window.onload = fetchComments;
