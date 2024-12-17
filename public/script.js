@@ -8,11 +8,10 @@ commentForm.addEventListener('submit', function (event) {
 
   // 입력 필드 값 가져오기
   const username = document.getElementById('username').value.trim();
-  const email = document.getElementById('email').value.trim();
   const comment = document.getElementById('comment').value.trim();
 
   // 유효성 검사
-  if (!username || !email || !comment) {
+  if (!username || !comment) {
     alert('모든 필드를 채워주세요!');
     return;
   }
