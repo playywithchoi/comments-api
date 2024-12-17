@@ -1,7 +1,7 @@
 // 댓글 목록을 가져오는 함수
 const fetchComments = async () => {
   try {
-    const response = await fetch('https://comments-b51s753wq-yeonjus-projects-b2ee6582.vercel.app/api/comments');
+    const response = await fetch('https://comments-9pka49fvd-yeonjus-projects-b2ee6582.vercel.app/');
     if (!response.ok) throw new Error('댓글 목록을 가져오는 데 실패했습니다.');
     const comments = await response.json();
     displayComments(comments); // 댓글 화면에 표시
