@@ -1,10 +1,12 @@
 const express = require('express');
-const cors = require('cors');
+const cors = require('cors');  // CORS 미들웨어 import
 const mongoose = require('mongoose');
-const Comment = require('./models/comment'); // 댓글 모델 경로
+const Comment = require('./models/comment');  // 댓글 모델 경로
 
 const app = express();
-app.use(cors()); // 모든 도메인에서의 요청을 허용
+
+// CORS 설정: 모든 도메인에서 요청을 허용
+app.use(cors());
 
 app.use(express.json()); // 요청 본문을 JSON으로 파싱
 
