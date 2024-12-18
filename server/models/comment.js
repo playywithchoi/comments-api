@@ -1,5 +1,5 @@
 // models/comment.js
-
+const response = await fetch('https://comments-qcb03wu4d-yeonjus-projects-b2ee6582.vercel.app/api/comments');
 const mongoose = require('mongoose');
 
 // 댓글 스키마 정의
