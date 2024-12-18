@@ -1,6 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import { connectToDatabase } from './utils/mongodb.js';
+import connectDB from './utils/mongodb.js';
 import commentRoutes from './api/comments.js';
 
 dotenv.config();
