@@ -1,18 +1,18 @@
-// C:\Users\CFT\my-project\client\script.js
-
 async function fetchComments() {
+  const apiUrl = import.meta.env.VITE_API_URL;  // 환경 변수 사용
   try {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/comments`);
+    const response = await fetch(apiUrl);
     if (!response.ok) {
-      throw new Error("댓글 목록을 가져오는 데 실패했습니다.");
+      throw new Error('Failed to fetch comments');
     }
-    const data = await response.json();
-    console.log("댓글 목록:", data);
+    const comments = await response.json();
+    const commentsList = document.getElementById('comments-list');
+    commentsList.innerHTML = comments
+      .map(comment => `<p>${comment.text}</p>`)
+      .join('');
   } catch (error) {
-    console.error("댓글 목록 가져오기 실패:", error);
-    alert("댓글 목록을 가져오는 데 실패했습니다.");
+    console.error('댓글 목록 가져오기 실패:', error);
   }
 }
 
-// 페이지 로드 시 댓글 목록 가져오기
 fetchComments();

@@ -1,19 +1,31 @@
+// server.js
 import express from 'express';
-import mongoose from 'mongoose';
-import dotenv from 'dotenv';  // dotenv 패키지 임포트
-
-dotenv.config();  // .env 파일을 로드
+import connectToDatabase from './utils/mongodb.js'; // MongoDB 연결 함수 import
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = 5000;
 
-app.use(express.json());
+// 서버 시작 전 DB 연결
+connectToDatabase();
 
-// MongoDB 연결
-mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.log("MongoDB connection error:", err));
+app.use(express.json());  // POST 요청의 JSON 바디를 처리할 수 있게 함
 
+// 간단한 GET 요청 예시
+app.get('/', (req, res) => {
+  res.send('Server is running');
+});
+
+// 댓글 데이터를 다룰 엔드포인트 예시
+app.get('/api/comments', async (req, res) => {
+  try {
+    // 데이터베이스에서 댓글 데이터를 가져오는 로직 추가
+    res.status(200).json({ message: 'Comments fetched successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Error fetching comments', error: err.message });
+  }
+});
+
+// 서버 시작
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
