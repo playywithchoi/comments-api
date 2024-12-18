@@ -9,6 +9,7 @@ const fetchComments = async () => {
         displayComments(comments);
     } catch (error) {
         console.error('댓글 목록 가져오기 실패:', error);
+        alert('댓글 목록을 가져오는 데 실패했습니다. 콘솔에서 오류를 확인해주세요.');
     }
 };
 
