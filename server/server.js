@@ -1,40 +1,33 @@
 // server.js
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
-const app = express();
 
-// CORS 설정 (클라이언트와 다른 도메인일 경우 필요)
+// 서버 설정
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+// 미들웨어 설정
 app.use(cors());
+app.use(express.json()); // POST 데이터 받기
 
 // MongoDB 연결
-mongoose.connect(process.env.MONGODB_URI)
+const MONGODB_URI = process.env.MONGODB_URI; // .env 파일에서 환경 변수 가져오기
+mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
     console.log('MongoDB connected');
   })
-  .catch((error) => {
-    console.error('MongoDB connection error:', error);
+  .catch((err) => {
+    console.error('MongoDB connection error:', err);
   });
 
-// 모델 정의
-const Comment = mongoose.model('Comment', new mongoose.Schema({
-  content: String,
-}));
+// API 라우터 설정
+const commentRouter = require('./api/comments'); // api/comments.js를 불러옴
+app.use('/api/comments', commentRouter); // "/api/comments" 경로로 접근하면 commentRouter로 이동
 
-// 댓글 목록을 가져오는 GET 요청 처리
-app.get('/api/comments', async (req, res) => {
-  try {
-    const comments = await Comment.find();  // 댓글 목록을 가져옴
-    res.json(comments);
-  } catch (error) {
-    console.error('댓글 목록을 가져오는 중 오류 발생:', error);
-    res.status(500).json({ error: '댓글 목록을 가져오는 데 실패했습니다.' });
-  }
-});
-
-// 서버 포트 설정 (환경 변수에서 가져옴, 기본값은 5000)
-const PORT = process.env.PORT || 5000;
+// 서버 시작
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
