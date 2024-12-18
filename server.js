@@ -1,39 +1,58 @@
-// script.js
+require('dotenv').config();
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const app = express();
 
-// 클라이언트에서 API URL 직접 설정
-const apiUrl = 'https://comments-b51s753wq-yeonjus-projects-b2ee6582.vercel.app/api/comments';
+// CORS 설정 (모든 도메인에서 허용)
+app.use(cors());
 
-const fetchComments = async () => {
+// JSON 요청을 파싱하도록 설정
+app.use(express.json());
+
+// MongoDB 모델 정의
+const commentSchema = new mongoose.Schema({
+  name: String,
+  comment: String,
+});
+
+const Comment = mongoose.model('Comment', commentSchema);
+
+// MongoDB 연결
+const uri = process.env.MONGODB_URI;
+if (!uri) {
+  throw new Error('MONGODB_URI is undefined. Check your .env file.');
+}
+
+mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('MongoDB connected'))
+  .catch((err) => console.error('MongoDB connection error:', err));
+
+// 댓글 가져오기 API
+app.get('/api/comments', async (req, res) => {
   try {
-    const response = await fetch(apiUrl);  // 직접 설정한 API URL 사용
-    
-    if (!response.ok) {
-      throw new Error(`댓글 목록을 가져오는 데 실패했습니다. 상태: ${response.status}`);
-    }
-    
-    const comments = await response.json();
-    displayComments(comments); // 댓글 화면에 표시
+    const comments = await Comment.find();
+    res.json(comments);
   } catch (error) {
-    console.error('댓글 목록 가져오기 실패:', error);
+    res.status(500).json({ message: 'Error retrieving comments' });
   }
-};
+});
 
-// 댓글을 화면에 표시하는 함수
-const displayComments = (comments) => {
-  const commentsList = document.getElementById('commentsList');
-  commentsList.innerHTML = ''; // 기존 댓글 목록 초기화
+// 댓글 추가 API
+app.post('/api/comments', async (req, res) => {
+  const { name, comment } = req.body;
+  const newComment = new Comment({ name, comment });
 
-  if (comments.length === 0) {
-    commentsList.innerHTML = '댓글이 없습니다.';
-    return;
+  try {
+    await newComment.save();
+    res.status(201).json(newComment);
+  } catch (error) {
+    res.status(500).json({ message: 'Error saving comment' });
   }
+});
 
-  comments.forEach(comment => {
-    const listItem = document.createElement('li');
-    listItem.textContent = `${comment.name}: ${comment.comment}`;
-    commentsList.appendChild(listItem);
-  });
-};
-
-// 페이지 로드 시 댓글 목록 가져오기
-window.onload = fetchComments;
+// 서버 시작
+const port = 5000;
+app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
+});
